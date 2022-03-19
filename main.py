@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 
-from routes.user import user
+from routes.pm import pm
+from routes.light import light
 
 app = FastAPI()
-app.include_router(user)
-
-
+app.include_router(pm)
+app.include_router(light)
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def check_app():
+    return {"message": "API is running."}
