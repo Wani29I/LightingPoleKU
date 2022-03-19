@@ -13,4 +13,4 @@ class PmStatus(BaseModel):
     pm1: float
     pm10: float
     pm25: float
-    # Timestamp: Optional[datetime]
+    # Timestamp: float

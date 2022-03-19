@@ -9,19 +9,24 @@ from bson import ObjectId
 pm = APIRouter(prefix='/pm')
 
 @pm.get('/{id}')
-async def find_light_status():
+async def find_pm_status(id):
     try:
         return serializeDict(pmDb.find_one({"_id":ObjectId(id)}))
     except:
         raise HTTPException(status_code=400, detail="pole with the provided id could not be found")
 
 @pm.post('/{id}')
-async def create_light_status(pmStatus : PmStatus):
+async def create_pm_status(id, pmStatus : PmStatus):
     try:
         pmData = dict(pmStatus)
-        pmData['poleId'] = id 
+        pmData['poleId'] = id
         pmData['timestamp'] = datetime.timestamp(datetime.now())
-        pmDb.insert_one(pmData)
-        return {"message":"create successfully"}
-    except:
+        _id = pmDb.insert_one(pmData).inserted_id
+        pmData['_id'] = str(_id)
+        return {
+        'message': 'created succesfully',
+          'data': pmData
+        }
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=400, detail="wrong format")
