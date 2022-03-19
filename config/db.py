@@ -3,5 +3,5 @@ from decouple import config
 
 client = MongoClient(config('MONGO_URL'))
 
-userDb = client.EventKU.User
-eventDb = client.EventKU.Event
+userDb = client.LightingPole.User
+eventDb = client.LightingPole.Event
