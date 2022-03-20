@@ -10,6 +10,16 @@ from schemas.utils import serializeDict, serializeList
 
 light = APIRouter(prefix='/light')
 
+async def update_light(id: str,lightStatus: LightStatus):
+    try: 
+        lightDb.update_one({"poleId":id},{ '$set' :dict(lightStatus)})
+        return {
+          'message': 'updated succesfully',
+        }
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=400, detail="wrong format")
+
 @light.get('/')
 async def find_all_light_status():
     try:
@@ -27,6 +37,9 @@ async def find_one_light_status(id):
 @light.post('/{id}')
 async def create_light_status(id,lightStatus : LightStatus):
     try:
+        oldLight = lightDb.find_one({'poleId': id})
+        if(oldLight):
+            return update_light(id,lightStatus)
         lightData = {
             **dict(lightStatus),
             'poleId': id,
@@ -42,14 +55,8 @@ async def create_light_status(id,lightStatus : LightStatus):
         raise HTTPException(status_code=400, detail="wrong format")
 
 @light.patch('/{id}')
-async def update_light_status(id,lightStatus : LightStatus):
-    try: 
-        lightDb.update_one({"poleId":id},lightStatus)
-        return {
-          'message': 'updated succesfully',
-        }
-    except:
-        raise HTTPException(status_code=400, detail="wrong format")
+async def update_light_status(id: str,lightStatus : LightStatus):
+    return update_light(id,lightStatus)
     
 @light.post("/toggle/{id}")
 async def toggle_light_by_admin(id,current_user: User = Depends(get_current_active_user)):
