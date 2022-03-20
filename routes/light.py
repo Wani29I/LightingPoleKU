@@ -1,9 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from config.db import lightDb
 from models.light import LightStatus
-from schemas.user import serializeDict, serializeList
 from bson import ObjectId
+from models.user import User
+from schemas.user import get_current_active_user
+
+from schemas.utils import serializeDict, serializeList
 
 light = APIRouter(prefix='/light')
 
@@ -24,9 +27,10 @@ async def find_one_light_status(id):
 @light.post('/{id}')
 async def create_light_status(id,lightStatus : LightStatus):
     try:
-        print(lightStatus)
-        lightData = dict(lightStatus)
-        lightData['poleId'] = id
+        lightData = {
+            **dict(lightStatus),
+            'poleId': id,
+        }
         _id = lightDb.insert_one(lightData).inserted_id
         lightData['_id'] = str(_id)
         return {
@@ -47,3 +51,16 @@ async def update_light_status(id,lightStatus : LightStatus):
     except:
         raise HTTPException(status_code=400, detail="wrong format")
     
+@light.post("/toggle/{id}")
+async def read_users_data(id,current_user: User = Depends(get_current_active_user)):
+    try:
+        poleData = lightDb.find_one({"poleId":id})
+        if not poleData:
+            raise Exception('error')
+        if poleData['status']:
+            poleData['status'] = 0
+        else:
+            poleData['status'] = 1
+        lightDb.update_one({"poleId":id},poleData)
+    except:
+        raise HTTPException(status_code=400, detail="could find pole")

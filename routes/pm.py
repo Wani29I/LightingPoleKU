@@ -3,8 +3,8 @@ from fastapi import APIRouter, HTTPException
 
 from config.db import pmDb
 from models.pm import PmStatus
-from schemas.user import serializeDict
 from bson import ObjectId
+from schemas.utils import serializeDict
 
 pm = APIRouter(prefix='/pm')
 
@@ -18,9 +18,11 @@ async def find_pm_status(id):
 @pm.post('/{id}')
 async def create_pm_status(id, pmStatus : PmStatus):
     try:
-        pmData = dict(pmStatus)
-        pmData['poleId'] = id
-        pmData['timestamp'] = datetime.timestamp(datetime.now())
+        pmData = {
+            **dict(pmStatus),
+            'poleId': id,
+            'timestamp': datetime.timestamp(datetime.now())
+        }
         _id = pmDb.insert_one(pmData).inserted_id
         pmData['_id'] = str(_id)
         return {
