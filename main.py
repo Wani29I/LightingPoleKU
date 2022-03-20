@@ -43,6 +43,9 @@ async def read_users_data(current_user: User = Depends(get_current_active_user))
 
 @app.post('/register',tags=['user'])
 async def register_new_user(user: NewUser):
+    account = userDb.find_one({'username': user.username})
+    if(account):
+        raise HTTPException(status_code='400',detail='username must be unique. Already have this account.')
     hash_pasword = get_password_hash(user.password)
     userData = dict(user)
     del userData['password']
