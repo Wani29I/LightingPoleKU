@@ -4,14 +4,14 @@ from fastapi import APIRouter, HTTPException
 from config.db import pmDb
 from models.pm import PmStatus
 from bson import ObjectId
-from schemas.utils import serializeDict
+from schemas.utils import serializeDict, serializeList
 
 pm = APIRouter(prefix='/pm')
 
 @pm.get('/{id}')
 async def find_pm_status(id):
     try:
-        return serializeDict(pmDb.find_one({"_id":ObjectId(id)}))
+        return serializeList(pmDb.find({"poleId":ObjectId(id)}))
     except:
         raise HTTPException(status_code=400, detail="pole with the provided id could not be found")
 
