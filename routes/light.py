@@ -16,7 +16,7 @@ async def update_light(id: str,lightStatus: LightStatus):
 @light.get('/')
 async def find_all_light_status():
     try:
-        return serializeList(lightDb.find_one())
+        return serializeList(lightDb.find())
     except:
         raise HTTPException(status_code=400, detail="some error")
 
