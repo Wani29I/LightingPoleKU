@@ -4,5 +4,5 @@ from decouple import config
 client = MongoClient(config('MONGO_URL'))
 
 userDb = client.LightingPole.User
-lightDb = client.LightingPole.LightStatus
+poleDb = client.LightingPole.Pole
 pmDb = client.LightingPole.PmStatus

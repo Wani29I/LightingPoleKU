@@ -15,7 +15,7 @@ class User(BaseModel):
     email: Optional[str] = None
     full_name: Optional[str] = None
     disabled: Optional[bool] = None
-    permission: Optional[int]
+    permission: Optional[int] = 0
 
 class UserInDB(User):
     hashed_password: str
