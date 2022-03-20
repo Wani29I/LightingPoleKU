@@ -52,7 +52,7 @@ async def register_new_user(user: NewUser):
     _id = userDb.insert_one({
         **userData,
         'hashed_password': hash_pasword,
-        'disable': False,
+        'disabled': False,
         'permission': 0,
     }).inserted_id
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
