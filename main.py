@@ -2,6 +2,7 @@ from datetime import timedelta
 from fastapi import Depends, FastAPI, HTTPException, status
 from models.user import NewUser, User
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 
 from models.user import Token
 from config.db import userDb
@@ -11,10 +12,20 @@ from schemas.user import authenticate_user, create_access_token, get_current_act
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
-
 app = FastAPI(
     title="LigthingHoleApp"
 )
+
+origins = ['*']
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(pm,tags=['pm'])
 app.include_router(light,tags=['light'])
 
