@@ -49,7 +49,7 @@ async def update_light_status(id: str,lightStatus : LightStatus):
         print(e)
         raise HTTPException(status_code=400, detail="wrong format")
     
-@light.post("/toggle/{id}")
+@light.patch("/toggle/{id}")
 async def toggle_light_by_admin(id,current_user: User = Depends(get_current_active_user)):
     try:
         if(current_user.permission == 0):
