@@ -7,8 +7,9 @@ class LightStatus(BaseModel):
 
 class LightingPole(BaseModel):
   name: str
+  image: str
   address: str
   lat: float
   long: float
   status: Optional[int] = 0
-
+  
