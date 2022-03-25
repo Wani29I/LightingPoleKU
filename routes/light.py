@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from config.db import poleDb
+from config.db import poleDb, pmDb
 from models.light import LightStatus, LightingPole
 from bson import ObjectId
 from models.user import User
@@ -17,10 +17,12 @@ async def find_all_pole():
     except:
         raise HTTPException(status_code=400, detail="some error")
 
-@light.get('/{id}')
-async def find_one_pole(id):
+@light.get('/{poldId}')
+async def find_one_pole(poldId):
     try:
-        return serializeDict(poleDb.find_one({"_id":ObjectId(id)}))
+        poleData = serializeDict(poleDb.find_one({"_id":ObjectId(poldId)}))
+        poleData['pm'] = serializeDict(pmDb.find({"poleId":poldId}).limit(1).sort([('$natural',-1)])[0])
+        return poleData
     except:
         raise HTTPException(status_code=400, detail="pole with the provided id could not be found")
 
