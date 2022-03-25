@@ -21,7 +21,10 @@ async def find_all_pole():
 async def find_one_pole(poldId):
     try:
         poleData = serializeDict(poleDb.find_one({"_id":ObjectId(poldId)}))
-        poleData['pm'] = serializeDict(pmDb.find({"poleId":poldId}).limit(1).sort([('$natural',-1)])[0])
+        try:
+            poleData['pm'] = serializeDict(pmDb.find({"poleId":poldId}).limit(1).sort([('$natural',-1)])[0])
+        except:
+            pass
         return poleData
     except:
         raise HTTPException(status_code=400, detail="pole with the provided id could not be found")
