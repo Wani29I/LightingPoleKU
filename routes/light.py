@@ -56,9 +56,9 @@ async def update_light_status(id: str,lightStatus : LightStatus):
     
 @light.patch("/toggle/{id}")
 async def toggle_light_by_admin(id,current_user: User = Depends(get_current_active_user)):
+    if(current_user.permission >= 0):
+        raise HTTPException(status_code=403, detail="no permission")
     try:
-        if(current_user.permission == 0):
-            raise HTTPException(status_code=403, detail="no permission")
         poleData = poleDb.find_one({"_id":ObjectId(id)})
         if not poleData:
             raise Exception('error')
@@ -66,6 +66,9 @@ async def toggle_light_by_admin(id,current_user: User = Depends(get_current_acti
             poleData['status'] = 0
         else:
             poleData['status'] = 1
-        poleDb.update_one({"_id":ObjectId(id)},poleData)
+        poleDb.update_one({"_id":ObjectId(id)},{'$set': poleData})
+        return {
+            'message': 'update successfully'
+        }
     except:
         raise HTTPException(status_code=400, detail="could find pole")
