@@ -7,19 +7,19 @@ from schemas.utils import serializeDict, serializeList
 
 pm = APIRouter(prefix='/pm')
 
-@pm.get('/{id}')
-async def find_pm_status(id):
+@pm.get('/{pole_id}')
+async def find_pm_status(pole_id):
     try:
-        return serializeList(pmDb.find({"poleId":id}))
+        return serializeList(pmDb.find({"poleId":pole_id}))
     except:
         raise HTTPException(status_code=400, detail="pole with the provided id could not be found")
 
-@pm.post('/{id}')
-async def create_pm_status(id, pmStatus : PmStatus):
+@pm.post('/{pole_id}')
+async def create_pm_status(pole_id, pmStatus : PmStatus):
     try:
         pmData = {
             **dict(pmStatus),
-            'poleId': id,
+            'poleId': pole_id,
             'timestamp': datetime.timestamp(datetime.now())
         }
         _id = pmDb.insert_one(pmData).inserted_id

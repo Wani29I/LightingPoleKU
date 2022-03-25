@@ -17,12 +17,12 @@ async def find_all_pole():
     except:
         raise HTTPException(status_code=400, detail="some error")
 
-@light.get('/{poldId}')
-async def find_one_pole(poldId):
+@light.get('/{pold_id}')
+async def find_one_pole(pold_id):
     try:
-        poleData = serializeDict(poleDb.find_one({"_id":ObjectId(poldId)}))
+        poleData = serializeDict(poleDb.find_one({"_id":ObjectId(pold_id)}))
         try:
-            poleData['pm'] = serializeDict(pmDb.find({"poleId":poldId}).limit(1).sort([('$natural',-1)])[0])
+            poleData['pm'] = serializeDict(pmDb.find({"poleId":pold_id}).limit(1).sort([('$natural',-1)])[0])
         except:
             pass
         return poleData
@@ -43,10 +43,32 @@ async def create_pole(lightingPole: LightingPole):
         print(e)
         raise HTTPException(status_code=400, detail="wrong format")
 
-@light.patch('/{id}')
-async def update_light_status(id: str,lightStatus : LightStatus):
+@light.patch('/pole/{pold_id}')
+async def update_pole(pold_id: str,lightPole : LightingPole):
     try: 
-        poleDb.update_one({"_id": ObjectId(id)},{ '$set' :dict(lightStatus)})
+        poleDb.update_one({"_id": ObjectId(pold_id)},{ '$set' :dict(lightPole)})
+        return {
+          'message': 'updated succesfully',
+        }
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=400, detail="wrong format")
+
+@light.delete('/pole/{pole_id}')
+async def delete_pole(pole_id: str):
+    try: 
+        poleDb.delete_one({"_id": ObjectId(pole_id)})
+        return {
+          'message': 'delete succesfully',
+        }
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=400, detail="wrong format")
+
+@light.patch('/{pole_id}')
+async def update_light_status(pole_id: str,lightStatus : LightStatus):
+    try: 
+        poleDb.update_one({"_id": ObjectId(pole_id)},{ '$set' :dict(lightStatus)})
         return {
           'message': 'updated succesfully',
         }
@@ -54,20 +76,20 @@ async def update_light_status(id: str,lightStatus : LightStatus):
         print(e)
         raise HTTPException(status_code=400, detail="wrong format")
     
-@light.patch("/toggle/{id}")
-async def toggle_light_by_admin(id,current_user: User = Depends(get_current_active_user)):
+@light.patch("/toggle/{pole_id}")
+async def toggle_light_by_admin(pole_id,current_user: User = Depends(get_current_active_user)):
     print(current_user)
     if(current_user.permission < 0):
         raise HTTPException(status_code=403, detail="no permission")
     try:
-        poleData = poleDb.find_one({"_id":ObjectId(id)})
+        poleData = poleDb.find_one({"_id":ObjectId(pole_id)})
         if not poleData:
             raise Exception('error')
         if poleData['status']:
             poleData['status'] = 0
         else:
             poleData['status'] = 1
-        poleDb.update_one({"_id":ObjectId(id)},{'$set': poleData})
+        poleDb.update_one({"_id":ObjectId(pole_id)},{'$set': poleData})
         return {
             'message': 'update successfully'
         }
