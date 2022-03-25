@@ -33,7 +33,7 @@ app.include_router(light,tags=['light'])
 async def check_app():
     return {"message": "API is running."}
 
-@app.post("/login", response_model=Token,tags=['user'])
+@app.post("/login",tags=['user'])
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -46,7 +46,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    userData = dict(user)
+    del userData['hashed_password']
+    return {"accessToken": access_token, "tokenType": "bearer", 'user': userData}
 
 @app.get("/users/me/", response_model=User,tags=['user'])
 async def read_users_data(current_user: User = Depends(get_current_active_user)):
@@ -72,7 +74,7 @@ async def register_new_user(user: NewUser):
     )
     return {
         'message': 'register success',
-        'access_token': access_token,
+        'accessToken': access_token,
         'data': {
             **userData,
             'userId': str(_id)

@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    accessToken: str
+    tokenType: str
 
 
 class TokenData(BaseModel):
@@ -13,7 +13,7 @@ class TokenData(BaseModel):
 class User(BaseModel):
     username: str
     email: Optional[str] = None
-    full_name: Optional[str] = None
+    fullName: Optional[str] = None
     disabled: Optional[bool] = None
     permission: Optional[int] = 0
 
