@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException
 
 from config.db import pmDb
@@ -8,9 +8,10 @@ from schemas.utils import serializeDict, serializeList
 pm = APIRouter(prefix='/pm')
 
 @pm.get('/{pole_id}')
-async def find_pm_status(pole_id):
+async def find_pm_status(pole_id,day: int = 1):
     try:
-        return serializeList(pmDb.find({"poleId":pole_id}))
+        lastweek = datetime.timestamp(datetime.now() -timedelta(days=day))
+        return serializeList(pmDb.find({"poleId":pole_id, "timestamp": {"$gt": lastweek}}))
     except:
         raise HTTPException(status_code=400, detail="pole with the provided id could not be found")
 
