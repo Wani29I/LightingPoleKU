@@ -17,12 +17,12 @@ async def find_all_pole():
     except:
         raise HTTPException(status_code=400, detail="some error")
 
-@light.get('/{pold_id}')
-async def find_one_pole(pold_id):
+@light.get('/{pole_id}')
+async def find_one_pole(pole_id):
     try:
-        poleData = serializeDict(poleDb.find_one({"_id":ObjectId(pold_id)}))
+        poleData = serializeDict(poleDb.find_one({"_id":ObjectId(pole_id)}))
         try:
-            poleData['pm'] = serializeDict(pmDb.find({"poleId":pold_id}).limit(1).sort([('$natural',-1)])[0])
+            poleData['pm'] = serializeDict(pmDb.find({"poleId":pole_id}).limit(1).sort([('$natural',-1)])[0])
         except:
             pass
         return poleData
@@ -43,10 +43,10 @@ async def create_pole(lightingPole: LightingPole):
         print(e)
         raise HTTPException(status_code=400, detail="wrong format")
 
-@light.patch('/pole/{pold_id}')
-async def update_pole(pold_id: str,lightPole : LightingPole):
+@light.patch('/pole/{pole_id}')
+async def update_pole(pole_id: str,lightPole : LightingPole):
     try: 
-        poleDb.update_one({"_id": ObjectId(pold_id)},{ '$set' :dict(lightPole)})
+        poleDb.update_one({"_id": ObjectId(pole_id)},{ '$set' :dict(lightPole)})
         return {
           'message': 'updated succesfully',
         }
